@@ -1,22 +1,41 @@
+const TIME = 100;
 const filas = parseInt(prompt("Cantidad de Filas: "));
 const columnas = parseInt(prompt("Cantidad de Columnas: "));
+let num = 1;
 
-let spiralMatrix = fillArray(filas, columnas);
-getSpiralMatrix(spiralMatrix);
-console.log(showArray(spiralMatrix));
+const inverted = confirm("¿Desea comenzar la secuencia de números al revéz?: ");
+if(inverted) {
+    num = filas * columnas;
+}
+const op = confirm("¿Desea comenzar desde algún número?: ");
+if(op) {
+    num = parseInt(prompt("Introduzca un Número: "));
+}
 
-function fillArray(rows, columns) {
-    arr = [];
+const gridRows = repeatNTimesSomeValue(filas, "1fr ");
+const gridColumns = repeatNTimesSomeValue(columnas, "1fr ");
+
+const targetDiv = document.getElementById("targetDiv");
+targetDiv.style.gridTemplateColumns = gridColumns;
+targetDiv.style.gridTemplateRows = gridRows;
+
+const renderArr = [];
+fillRenderArr(renderArr, targetDiv);
+
+const spiralMatrix = [];
+fillArray(spiralMatrix, filas, columnas);
+getAndRenderSpiralMatrix(spiralMatrix, inverted, num, TIME);
+
+function fillArray(arr, rows, columns) {
     for(let i = 0; i < rows; i++) {
         arr.push([]);
         for(let j = 0; j < columns; j++) {
             arr[i].push("Template");
         }
     }
-    return arr;
 }
 
-function getSpiralMatrix(arr) {
+async function getAndRenderSpiralMatrix(arr, inverted, num, time) {
     const rows = arr.length;
     const columns = arr[0].length;
 
@@ -31,8 +50,15 @@ function getSpiralMatrix(arr) {
                 i++;
                 continue;
             }
-            arr[i][j] = counter;
+            arr[i][j] = num;
+            await sleep(time);
+            document.getElementById(`${i}-${j}`).innerText = num;
             j++;
+            if(inverted) {
+                num--;
+            } else {
+                num++;
+            }
             counter++;
         }
         while(actualState === "down") {
@@ -42,8 +68,15 @@ function getSpiralMatrix(arr) {
                 j--;
                 continue;
             }
-            arr[i][j] = counter;
+            arr[i][j] = num;
+            await sleep(time);
+            document.getElementById(`${i}-${j}`).innerText = num;
             i++;
+            if(inverted) {
+                num--;
+            } else {
+                num++;
+            }
             counter++;
         }
         while(actualState === "right") {
@@ -53,8 +86,15 @@ function getSpiralMatrix(arr) {
                 i--;
                 continue;
             }
-            arr[i][j] = counter;
+            arr[i][j] = num;
+            await sleep(time);
+            document.getElementById(`${i}-${j}`).innerText = num;
             j--;
+            if(inverted) {
+                num--;
+            } else {
+                num++;
+            }
             counter++;
         }
         while(actualState === "up") {
@@ -64,11 +104,45 @@ function getSpiralMatrix(arr) {
                 i++;
                 continue;
             }
-            arr[i][j] = counter;
+            arr[i][j] = num;
+            await sleep(time);
+            document.getElementById(`${i}-${j}`).innerText = num;
             i--;
+            if(inverted) {
+                num--;
+            } else {
+                num++;
+            }
             counter++;
         }
     }
+    console.log(showArray(spiralMatrix));
+}
+
+function repeatNTimesSomeValue(times, value) {
+    let result = "";
+    for(let i = 0; i < times; i++) {
+        result += value;
+    }
+    return result;
+}
+
+function fillRenderArr(renderArr, targetDiv) {
+    for(let i = 0; i < filas; i++) {
+        renderArr.push([]);
+        for(let j = 0; j < columnas; j++) {
+            const gridItem = document.createElement("div");
+            gridItem.id = `${i}-${j}`;
+            gridItem.classList.add("gridItem");
+            gridItem.innerText = ".";
+            renderArr[i].push(gridItem);
+            targetDiv.appendChild(gridItem);
+        }
+    }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function showArray(arr) {
